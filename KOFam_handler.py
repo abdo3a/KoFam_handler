@@ -33,13 +33,15 @@ for file_n in files('./'):
         infile_f1 = os.path.join('./', file_n.replace('.kofam','_f.tsv'))
         infile_f2 = os.path.join('./', file_n.replace('.kofam','_new.tsv'))
         outfile = os.path.join(out_path, file_n.replace('.kofam','.out'))
-        subprocess.run("sed 's/\*/ /g;s/ KO definition/\tKO_definition/g;s/           /\t/g;s/          /\t/g;s/         /\t/g;s/        /\t/g;s/       /\t/g;s/      /\t/g;s/     /\t/g;s/    /\t/g;s/   /\t/g;s/  /\t/g;s/ /\t/;s/ /\t/;s/gene\tname/gene_name/g' %s >%s"% (file_n,infile_f1), shell=True, executable='/bin/bash')
-        subprocess.run("paste <(cut -f2-4 %s|sed 's/-/0/g') <(cut -f5 %s) <(cut -f7-8 %s |sed 's/\t/ /g') > %s"% (infile_f1,infile_f1,infile_f1,infile_f2), shell=True, executable='/bin/bash')
+        subprocess.run("sed 's/\*/ /g;s/[ ]\+/ /g;s/KO definition/KO_definition/g;s/gene name/gene_name/g;s/ /\t/;s/ /\t/;s/ /\t/;s/ /\t/;s/ /\t/;s/ /\t/' %s >%s"% (file_n,infile_f1), shell=True, executable='/bin/bash')
+        subprocess.run("paste <(cut -f2-4 %s|sed 's/-/0/g') <(cut -f5 %s) <(cut -f7 %s) > %s"% (infile_f1,infile_f1,infile_f1,infile_f2), shell=True, executable='/bin/bash')
         os.remove(infile_f1)
 
         read_file = pd.read_csv(infile_f2,sep='\t')
         df = read_file[["gene_name", "KO", "thrshld", "score", "KO_definition"]]
         df.drop([0], inplace=True)
+        df['thrshld'] = pd.to_numeric(df['thrshld'])
+        df['score'] = pd.to_numeric(df['score'])
         df['ration'] = ((df["score"]/(df['thrshld']/100))).round(2)
         df.replace([np.inf, -np.inf], np.nan, inplace=True)
         df.dropna(subset=["ration"], how="all", inplace=True)
@@ -76,6 +78,7 @@ subprocess.run("chmod a+x %s && ./%s && sed  '3 i \n' %s|sed '/^n/s/n//g;s/.out/
 os.remove(os.path.join(out_path, 'ko.txt'))
 os.remove(os.path.join(out_path, 'matrix.txt'))
 os.remove(os.path.join(out_path, 'script'))
+
 
 
 
