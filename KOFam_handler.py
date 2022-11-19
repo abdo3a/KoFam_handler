@@ -59,8 +59,10 @@ for file_n in files('./'):
                 df2['ration'].values[df2['ration'].values >= 100] = 100
                 if df2.empty:
                     f.write(line + ',' + 'NO' + '\n')
-                else:
-                    f.write(df2["KO"].to_string(index=False, header=False) + ',' + df2["ration"].to_string(index=False, header=False) + ',' + df2["gene_name"].to_string(index=False, header=False) + ',' + df2["KO_definition"].to_string(index=False, header=False) + '\n')
+                elif int(len(df2.index)) == '1':
+                    f.write(str(df2["KO"].iloc[0]) + ',' + str(df2["ration"].iloc[0]) + ',' + str(df2["gene_name"].iloc[0]) + ',' + str(df2["KO_definition"].iloc[0]) + '\n')
+                elif int(len(df2.index)) != '1':
+                    f.write(str(df2["KO"].iloc[0]) + ',' + str(df2["ration"].iloc[0]) + ',' + str('|'.join(df2['gene_name'].tolist())) + ',' + str(df2["KO_definition"].iloc[0]) + '\n')
         f.close()
         
 
@@ -73,7 +75,7 @@ with open(os.path.join(out_path, 'script'),"w+") as mat:
 mat.close()
 
 
-subprocess.run("chmod a+x %s && ./%s && sed  '3 i \n' %s|sed '/^n/s/n//g;s/.out//g;s/.\///g' >> %s"% (os.path.join(out_path, 'script'), os.path.join(out_path, 'script'), os.path.join(out_path, 'matrix.txt'), os.path.join(out_path, 'matrix.out')), shell=True, executable='/bin/bash')
+subprocess.run("chmod a+x %s && ./%s && sed  '3 i \n' %s|sed '/^n/s/n//g;1 s/.out//g;1 s/%s\///g;1 s/.\///g' >> %s"% (os.path.join(out_path, 'script'), os.path.join(out_path, 'script'), os.path.join(out_path, 'matrix.txt'), output, os.path.join(out_path, 'matrix.out')), shell=True, executable='/bin/bash')
 
 os.remove(os.path.join(out_path, 'ko.txt'))
 os.remove(os.path.join(out_path, 'matrix.txt'))
