@@ -75,7 +75,7 @@ with open(os.path.join(out_path, 'script'),"w+") as mat:
 mat.close()
 
 
-subprocess.run("chmod a+x %s && ./%s && sed  '3 i \n' %s|sed '/^n/s/n//g;1 s/.out//g;1 s/%s\///g;1 s/.\///g' >> %s"% (os.path.join(out_path, 'script'), os.path.join(out_path, 'script'), os.path.join(out_path, 'matrix.txt'), output, os.path.join(out_path, 'matrix.out')), shell=True, executable='/bin/bash')
+subprocess.run("chmod a+x %s && ./%s && sed  '3 i \n' %s|sed '/^n/s/n//g;1 s/%s\///g;1 s/.\///g;1 s/.out//g' >> %s"% (os.path.join(out_path, 'script'), os.path.join(out_path, 'script'), os.path.join(out_path, 'matrix.txt'), output, os.path.join(out_path, 'matrix.out')), shell=True, executable='/bin/bash')
 
 os.remove(os.path.join(out_path, 'ko.txt'))
 os.remove(os.path.join(out_path, 'matrix.txt'))
